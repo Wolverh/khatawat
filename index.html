@@ -200,6 +200,22 @@
     </div>
   </div>
 
-  <footer>© 2026 Khatawat · خطوات</footer>
+  <footer>&copy; 2026 Khatawat &middot; خطوات</footer>
+
+  <!-- Detect if loaded inside an iframe (after form submission redirect) -->
+  <script>
+    (function() {
+      if (window.self !== window.top) {
+        // We're inside an iframe — notify the parent to redirect
+        try {
+          window.parent.postMessage({type: 'khatawat-submitted', url: window.location.href}, '*');
+        } catch(e) {}
+        // Also try direct top-level redirect (works if same-origin)
+        try {
+          window.top.location.href = window.location.href;
+        } catch(e) {}
+      }
+    })();
+  </script>
 </body>
 </html>
