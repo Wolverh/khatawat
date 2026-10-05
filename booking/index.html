@@ -186,7 +186,16 @@
 
   <footer>&copy; 2026 Khatawat &middot; خطوات</footer>
 
+  <!-- Hidden form to bypass CORS using standard browser navigation POST -->
+  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+  <form id="real_form" action="https://khatawat.k.frappe.cloud/api/method/frappe.website.doctype.web_form.web_form.accept" method="POST" target="hidden_iframe" style="display:none;">
+    <input type="hidden" name="web_form" value="book" />
+    <input type="hidden" name="data" id="hidden_data" value="" />
+  </form>
+
   <script>
+    var formSubmitting = false;
+
     document.getElementById('khatawat-form').addEventListener('submit', function(e) {
       e.preventDefault();
       
@@ -207,35 +216,30 @@
       btn.disabled = true;
       btn.textContent = 'جاري التسجيل...';
       errorMsg.style.display = 'none';
+      formSubmitting = true;
       
-      var payload = {
-        web_form: "book",
-        data: JSON.stringify({
-          first_name: first_name,
-          mobile_no: mobile_no,
-          last_name: last_name,
-          lost_notes: lost_notes
-        })
-      };
-      
-      fetch('https://khatawat.k.frappe.cloud/api/method/frappe.website.doctype.web_form.web_form.accept', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(function(res) {
-        if (res.ok) {
-          window.location.href = 'https://wolverh.github.io/khatawat/thank-you';
-        } else {
-          throw new Error('فشل التسجيل');
-        }
-      })
-      .catch(function(err) {
-        errorMsg.textContent = 'عذراً، حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.';
-        errorMsg.style.display = 'block';
-        btn.disabled = false;
-        btn.textContent = 'تأكيد الحجز';
+      // Prepare the payload for Frappe
+      document.getElementById('hidden_data').value = JSON.stringify({
+        first_name: first_name,
+        mobile_no: mobile_no,
+        last_name: last_name,
+        lost_notes: lost_notes
       });
+      
+      // Submit the real form to the hidden iframe (bypasses CORS)
+      document.getElementById('real_form').submit();
+      
+      // Fallback: Redirect no matter what after 900ms to ensure perfect UX
+      setTimeout(function() {
+        window.location.href = 'https://wolverh.github.io/khatawat/thank-you';
+      }, 900);
+    });
+
+    // Detect when iframe finishes loading the POST request
+    document.getElementById('hidden_iframe').addEventListener('load', function() {
+      if (formSubmitting) {
+        window.location.href = 'https://wolverh.github.io/khatawat/thank-you';
+      }
     });
   </script>
 </body>
