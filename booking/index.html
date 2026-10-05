@@ -18,7 +18,7 @@
       justify-content: flex-start;
       overflow-x: hidden;
       position: relative;
-      padding: 30px 16px 60px;
+      padding: 40px 16px 60px;
     }
 
     body::before, body::after {
@@ -51,7 +51,7 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 680px;
+      max-width: 600px;
       animation: slideUp 0.7s cubic-bezier(.22,1,.36,1) both;
     }
 
@@ -98,93 +98,48 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-radius: 24px;
-      padding: 10px;
+      padding: 40px;
       box-shadow:
         0 2px 4px rgba(0,0,0,0.02),
         0 20px 60px rgba(0,0,0,0.08),
         0 0 0 1px rgba(245,149,29,0.08);
       animation: fadeIn 0.8s ease 0.4s both;
-      overflow: hidden;
     }
 
-    .form-card iframe {
-      width: 100%;
-      min-height: 520px;
-      border: none;
-      border-radius: 16px;
-      display: block;
+    @media (max-width: 600px) {
+      .form-card { padding: 30px 20px; }
     }
 
-    /* Loading overlay shown after form submission detected */
-    .loading-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(10px);
-      z-index: 100;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.3s ease both;
+    .field { margin-bottom: 24px; text-align: right; }
+    .field label { display: block; margin-bottom: 8px; font-weight: 700; color: #2C3E50; font-size: 1.05rem; }
+    .field .req { color: #F5951D; margin-right: 4px; }
+    .field input, .field textarea {
+      width: 100%; padding: 14px 16px; border: 2px solid rgba(245,149,29,0.15); border-radius: 12px;
+      font-family: inherit; font-size: 1.05rem; background: #fafafa; transition: 0.3s;
     }
-    .loading-overlay.active { display: flex; }
+    .field input::placeholder, .field textarea::placeholder { color: #bbb; }
+    .field input:focus, .field textarea:focus {
+      outline: none; border-color: #F5951D; background: #fff; box-shadow: 0 0 0 4px rgba(245,149,29,0.1);
+    }
+    
+    .cols { display: flex; gap: 20px; }
+    .cols .field { flex: 1; }
+    @media (max-width: 500px) { .cols { flex-direction: column; gap: 0; } }
 
-    .spinner {
-      width: 56px; height: 56px;
-      border: 4px solid #f0f0f0;
-      border-top-color: #F5951D;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 20px;
+    .submit-btn {
+      width: 100%; padding: 16px; background: linear-gradient(90deg, #F5951D, #ffbe6a);
+      color: #fff; font-size: 1.2rem; font-weight: 800; border: none; border-radius: 12px; cursor: pointer;
+      transition: 0.3s; font-family: inherit; margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(245,149,29,0.2);
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loading-overlay p {
-      font-family: "Cairo", sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #2C3E50;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 28px;
-      animation: fadeIn 0.8s ease 0.6s both;
-    }
-    @media (max-width: 520px) { .features { grid-template-columns: 1fr; } }
-
-    .feature {
-      background: rgba(255,255,255,0.8);
-      border-radius: 16px;
-      padding: 20px 16px;
-      text-align: center;
-      border: 1px solid rgba(245,149,29,0.08);
-    }
-    .feature .icon {
-      font-size: 1.8rem;
-      margin-bottom: 8px;
-    }
-    .feature h3 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #2C3E50;
-      margin-bottom: 4px;
-    }
-    .feature p {
-      font-size: 0.82rem;
-      color: #999;
-      font-weight: 500;
-    }
+    .submit-btn:hover { box-shadow: 0 6px 20px rgba(245,149,29,0.3); transform: translateY(-2px); }
+    .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .error { color: #d9534f; font-size: 1rem; margin-top: 15px; display: none; font-weight: 700; text-align: center; }
 
     footer {
-      position: fixed;
-      bottom: 16px;
-      left: 0; right: 0;
+      margin-top: 40px;
       text-align: center;
-      font-size: 0.78rem;
+      font-size: 0.85rem;
       color: #bbb;
       font-family: "Cairo", sans-serif;
       z-index: 2;
@@ -201,49 +156,87 @@
     </div>
 
     <div class="form-card">
-      <iframe
-        id="form-frame"
-        src="https://khatawat.k.frappe.cloud/crm-form/Book?embed=1"
-        title="نموذج الحجز"
-        allow="clipboard-write"
-      ></iframe>
-    </div>
+      <form id="khatawat-form">
+        <div class="field">
+          <label>الاسم الكريم <span class="req">*</span></label>
+          <input type="text" id="first_name" required placeholder="أدخل اسمك الكريم" />
+        </div>
+        
+        <div class="cols">
+          <div class="field">
+            <label>رقم الهاتف</label>
+            <input type="tel" id="mobile_no" placeholder="أدخل رقم الهاتف" />
+          </div>
+          <div class="field">
+            <label>المدينة</label>
+            <input type="text" id="last_name" placeholder="أدخل مدينتك" />
+          </div>
+        </div>
 
+        <div class="field">
+          <label>اسم المشروع وتفاصيله باختصار</label>
+          <textarea id="lost_notes" rows="4" placeholder="حدثنا عن مشروعك..."></textarea>
+        </div>
+        
+        <button type="submit" id="submit-btn" class="submit-btn">تأكيد الحجز</button>
+        <div id="error-msg" class="error"></div>
+      </form>
     </div>
-  </div>
-
-  <div class="loading-overlay" id="loading">
-    <div class="spinner"></div>
-    <p>جاري تسجيل بياناتك...</p>
   </div>
 
   <footer>&copy; 2026 Khatawat &middot; خطوات</footer>
 
   <script>
-    (function() {
-      var iframe = document.getElementById('form-frame');
-      var loadCount = 0;
-      var redirectURL = 'https://wolverh.github.io/khatawat/thank-you';
-      var loading = document.getElementById('loading');
-
-      // Detect when iframe navigates (2nd load = after form submission redirect)
-      iframe.addEventListener('load', function() {
-        loadCount++;
-        if (loadCount > 1) {
-          // The iframe navigated — form was submitted and Frappe redirected
-          // Redirect the parent page immediately
-          window.location.href = redirectURL;
+    document.getElementById('khatawat-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      var btn = document.getElementById('submit-btn');
+      var errorMsg = document.getElementById('error-msg');
+      
+      var first_name = document.getElementById('first_name').value.trim();
+      var mobile_no = document.getElementById('mobile_no').value.trim();
+      var last_name = document.getElementById('last_name').value.trim();
+      var lost_notes = document.getElementById('lost_notes').value.trim();
+      
+      if (!first_name) {
+        errorMsg.textContent = 'الاسم الكريم مطلوب';
+        errorMsg.style.display = 'block';
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'جاري التسجيل...';
+      errorMsg.style.display = 'none';
+      
+      var payload = {
+        web_form: "book",
+        data: JSON.stringify({
+          first_name: first_name,
+          mobile_no: mobile_no,
+          last_name: last_name,
+          lost_notes: lost_notes
+        })
+      };
+      
+      fetch('https://khatawat.k.frappe.cloud/api/method/frappe.website.doctype.web_form.web_form.accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(function(res) {
+        if (res.ok) {
+          window.location.href = 'https://wolverh.github.io/khatawat/thank-you';
+        } else {
+          throw new Error('فشل التسجيل');
         }
+      })
+      .catch(function(err) {
+        errorMsg.textContent = 'عذراً، حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.';
+        errorMsg.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'تأكيد الحجز';
       });
-
-      // Also listen for postMessage from the thank-you page (belt & suspenders)
-      window.addEventListener('message', function(e) {
-        if (e.data && e.data.type === 'khatawat-submitted') {
-          loading.classList.add('active');
-          window.location.href = e.data.url || redirectURL;
-        }
-      });
-    })();
+    });
   </script>
 </body>
 </html>
